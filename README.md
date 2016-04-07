@@ -4,31 +4,72 @@ Exiv2 is a native c++ extension for [io.js](https://iojs.org/en/index.html) and
 [node.js](https://nodejs.org/) that provides support for reading and writing
 image metadata via the [Exiv2 library](http://www.exiv2.org).
 
-## Dependencies
+***
 
-To build this addon you'll need the Exiv2 library and headers so if you're using
-a package manager you might need to install an additional "-dev" packages.
+## A word about this fork
 
-### Debian
+This fork was made to use exiv2node without having dylib dependencies (other than system libs like libstdc++ or libSystem). The point is to make it embedable anywhere as soon as it is compiled for the target plateform. In my personal case, I made it to use within Electron so that I don't have to worry about distribution.  
 
-    apt-get install libexiv2 libexiv2-dev
+### What you need to activate static linking
 
-### OS X
+in the file `binding.gyp`, edit the following lines with the real path on your machine:
 
-You'll also need to install pkg-config to help locate the library and headers.
+```json
+'include_dirs' : [
+        '/path/exiv2/include',
+        '/path/to/expat/include',
+         ...
+      ],
+```
 
-[MacPorts](http://macports.org/):
+and
 
-    port install pkgconfig exiv2
+```json
+'libraries': [
+        '/path/to/libexiv2.a',
+        '/path/to/libexpat.a'
+      ],
+```
 
-[Homebrew](http://github.com/mxcl/homebrew/):
+I strongly advise you do not use port or brew to get exiv2 because it will give you only dylib, which won't help you. (reminder: you cannot static link a dylib). So download the [sources of exif2](http://www.exiv2.org/download.html) and compile them using a regular:
 
-    brew install pkg-config exiv2
+```shell
+$ ./configure --prefix=/some/local/folder/of/yours/
+$ make; make install
+```
 
-### Other systems
+**What about libExpat?**
 
-See the [Exiv2 download page](http://www.exiv2.org/download.html) for more
-information.
+You might already have it on your system. To check, type:
+
+```shell
+$ pkg-config --libs --static expat
+```
+
+(you don't have pkg-config? install it with `brew install pkg-config` or `sudo port install pkgconfig`)
+
+If it gives you a result, it means it is certainly at `/opt/local/lib/libexpat.a` (or whatever folder it gave you with the **-L**).
+
+When you have edited to `biding.gyp`, you can run:
+
+```shell
+$ cd exiv2node
+$ npm install
+```
+
+The result, in addition to download npm dependencies, should be a binary file at `exiv2node/build/Release/exiv2.node`, weighting approximatelly 2.7MB.  
+Be sure this `exiv2.node` file does not have any dependencies with:
+
+```shell
+# on mac osx
+$ otool -L exiv2.node
+
+# on linux
+$ ldd exiv2.node
+```
+
+Now, you can follow to rest of the original **readme**...
+***
 
 ## Installation Instructions
 
