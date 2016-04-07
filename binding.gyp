@@ -6,7 +6,8 @@
         'exiv2node.cc'
       ],
       'include_dirs' : [
-        '<!@(pkg-config --variable=includedir exiv2)',
+        '/path/exiv2/include',
+        '/path/to/expat/include',
         "<!(node -e \"require('nan')\")"
       ],
       'xcode_settings': {
@@ -18,7 +19,9 @@
         '-fexceptions'
       ],
       'libraries': [
-        '<!@(pkg-config --libs exiv2)'
+        '/path/to/libexiv2.a',
+        '/path/to/libexpat.a'
+
       ],
     }
   ]
